@@ -1,16 +1,11 @@
 package com.isd.authentication.controller;
 
-import com.isd.authentication.domain.User;
-import com.isd.authentication.dto.UserBalanceTransactionDTO;
-import com.isd.authentication.dto.UserCreateDTO;
+import com.isd.authentication.dto.*;
 import com.isd.authentication.mapper.UserMapperService;
-import com.isd.authentication.service.UserService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/user")
@@ -25,14 +20,21 @@ public class UserController {
 //    private UserService us;
 
     @GetMapping(path="/")
-    public @ResponseBody Iterable<UserBalanceTransactionDTO> getAllUsers(){
+    public @ResponseBody Iterable<UserBalanceDTO> getAllUsers(){
         return umps.getAll();
     }
 
 
+    @GetMapping(path="/findbyid")
+    public @ResponseBody
+    UserBalanceTransDTO getUserById(@RequestParam @NotNull Integer userId) throws Exception{
+        return umps.findUserById(userId);
+    }
+
     @PostMapping(path="/create")
-    public @ResponseBody UserBalanceTransactionDTO create(@RequestBody UserCreateDTO body) throws Exception {
-        UserBalanceTransactionDTO toRet = null;
+    public @ResponseBody
+    UserBalanceDTO create(@RequestBody UserCreateDTO body) throws Exception {
+        UserBalanceDTO toRet = null;
 
         try {
             toRet = umps.createUser(body);
@@ -44,13 +46,26 @@ public class UserController {
         return toRet;
     }
 
-
     @PostMapping(path="/delete")
-    public @ResponseBody UserBalanceTransactionDTO del(@NotNull @RequestBody UserCreateDTO body) throws Exception {
-        UserBalanceTransactionDTO toRet = null;
+    public @ResponseBody
+    UserBalanceDTO del(@NotNull @RequestParam Integer userId) throws Exception {
+        UserBalanceDTO toRet = null;
 
         try {
-            toRet = umps.deleteUser(body.getUsername());
+            toRet = umps.deleteUser(userId);
+        } catch (Error e){
+            new Exception(e.getMessage());
+        }
+
+        return toRet;
+    }
+
+    @PostMapping(path="/recharge")
+    public @ResponseBody TransactionResponseDTO recharge(@NotNull @RequestBody TransactionDTO body) throws Exception {
+        TransactionResponseDTO toRet = null;
+
+        try {
+            toRet = umps.recharge(body);
         } catch (Error e){
             new Exception(e.getMessage());
         }

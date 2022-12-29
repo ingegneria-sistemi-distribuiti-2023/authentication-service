@@ -9,4 +9,6 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
 
     List<Transaction> findAllByUserId(Integer userId);
+    Transaction save(Transaction transaction);
+    void deleteAllByUserId(Integer userId);
 }

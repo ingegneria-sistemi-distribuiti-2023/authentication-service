@@ -1,8 +1,11 @@
 package com.isd.authentication.domain;
 
+import com.isd.authentication.commons.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Date;
 
 
 @Entity
@@ -23,10 +26,13 @@ public class Transaction {
     private String circuit;
 
     @Column(nullable = false)
-    private Integer amount;
+    private Float amount;
 
     @Column(nullable = false, length = 45)
     private String status; // FIXME: swap to enum
+
+    @Column()
+    private Date date;
 
     // TODO: non necessario al momento
 //    @OneToOne(

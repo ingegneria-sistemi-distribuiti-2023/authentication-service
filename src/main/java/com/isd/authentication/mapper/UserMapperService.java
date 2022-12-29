@@ -1,18 +1,19 @@
 package com.isd.authentication.mapper;
 
+import com.isd.authentication.commons.TransactionStatus;
 import com.isd.authentication.domain.Balance;
+import com.isd.authentication.domain.Transaction;
 import com.isd.authentication.domain.User;
-import com.isd.authentication.dto.UserBalanceTransactionDTO;
-import com.isd.authentication.dto.UserCreateDTO;
+import com.isd.authentication.dto.*;
 import com.isd.authentication.repository.BalanceRepository;
 import com.isd.authentication.repository.TransactionRepository;
 import com.isd.authentication.repository.UserRepository;
-import com.isd.authentication.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,12 +36,15 @@ public class UserMapperService {
     @Autowired
     private TransactionRepository tr;
 
-    public List<UserBalanceTransactionDTO> getAll() {
+    @Autowired
+    TransactionMapperService trmps;
+
+    public List<UserBalanceDTO> getAll() {
         return ur.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    public UserBalanceTransactionDTO convertToDTO(User user){
-        UserBalanceTransactionDTO dto = new UserBalanceTransactionDTO();
+    public UserBalanceDTO convertToDTO(User user){
+        UserBalanceDTO dto = new UserBalanceDTO();
 
         dto.setUserId(user.getId());
         dto.setUsername(user.getUsername());
@@ -56,7 +60,7 @@ public class UserMapperService {
         return dto;
     }
 
-    public UserBalanceTransactionDTO createUser(UserCreateDTO current) throws Exception{
+    public UserBalanceDTO createUser(UserCreateDTO current) throws Exception{
 
         if (ur.findByUsername(current.getUsername()) != null ) {
             throw new Exception("Username already used");
@@ -69,30 +73,99 @@ public class UserMapperService {
 
         Balance balance = new Balance();
         balance.setUserId(newuser.getId());
-        balance.setBonus(0);
-        balance.setCashable(0);
+        balance.setBonus(0.0f);
+        balance.setCashable(0.0f);
         br.save(balance);
 
-        UserBalanceTransactionDTO toRet = new UserBalanceTransactionDTO(newuser.getId(), newuser.getUsername(), balance.getCashable(), balance.getBonus());
+        UserBalanceDTO toRet = new UserBalanceDTO(newuser.getId(), newuser.getUsername(), balance.getCashable(), balance.getBonus());
 
         return toRet;
     }
 
-    public UserBalanceTransactionDTO deleteUser(String username) throws Exception {
+    public UserBalanceDTO deleteUser(Integer id) throws Exception {
 
-        User current = ur.findByUsername(username);
+        // TODO:
+        // Solo per testare eliminazione. Aggiungi uno STATUS e metti 'enabled' per disattivare l'utenza
+
+        User current = ur.findOneById(id);
 
         if (current == null){
             throw new Exception("User not found");
         }
 
-        UserBalanceTransactionDTO toRet = this.convertToDTO(current);
+        UserBalanceDTO toRet = this.convertToDTO(current);
 
+        tr.deleteAllByUserId(current.getId());
         br.deleteByUserId(current.getId());
         ur.delete(current);
 
         return toRet;
 
+    }
+
+    public UserBalanceTransDTO findUserById(Integer id) throws Exception {
+        User usr = ur.findOneById(id);
+
+        if (usr == null){
+            throw new Exception("User not found");
+        }
+
+        UserBalanceTransDTO toRet = new UserBalanceTransDTO();
+
+        toRet.setUserId(usr.getId());
+        toRet.setUsername(usr.getUsername());
+
+        Balance bal = br.findByUserId(toRet.getUserId());
+
+        toRet.setBonusAmount(bal.getBonus());
+        toRet.setCashableAmount(bal.getCashable());
+
+        List<Transaction> allTrs = tr.findAllByUserId(id);
+
+        List<TransactionDTO> allTrsDto = new LinkedList<>();
+
+        for (Transaction t: allTrs){
+            allTrsDto.add(trmps.convertToDTO(t));
+        }
+
+        toRet.setTransactions(allTrsDto);
+
+        return toRet;
+    }
+
+    public TransactionResponseDTO recharge(TransactionDTO request) throws Exception {
+        TransactionResponseDTO response = new TransactionResponseDTO();
+
+        User usr = ur.findOneById(request.getUserId());
+
+        if (usr == null){
+            throw new Exception("User not found");
+        }
+
+        Transaction newtr = new Transaction();
+
+        // TODO: add timer to simulate process
+
+        newtr.setCircuit(request.getCircuit());
+        newtr.setAmount(request.getAmount());
+        newtr.setUserId(usr.getId());
+
+        // TODO: add logic to handle status
+        newtr.setStatus(TransactionStatus.CLOSED.toString());
+        tr.save(newtr);
+
+        Balance currBal = br.findByUserId(usr.getId());
+
+        Float totCash = currBal.getCashable() + newtr.getAmount();
+
+        currBal.setCashable(totCash);
+        br.save(currBal);
+
+        response.setMessage("Successful increase");
+        response.setTime(new Date());
+        response.setStatus(newtr.getStatus());
+
+        return response;
     }
 
 }

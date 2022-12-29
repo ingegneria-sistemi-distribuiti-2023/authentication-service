@@ -1,20 +1,26 @@
 package com.isd.authentication.dto;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /** DTO usato per visualizzare tutte le informazioni relative ad un utente **/
-public class UserBalanceTransactionDTO {
+public class UserBalanceTransDTO {
     private Integer userId;
     private String username;
-    private Integer cashableAmount;
-    private Integer bonusAmount;
+    private Float cashableAmount;
+    private Float bonusAmount;
+    private List<TransactionDTO> transactions;
 
-    public UserBalanceTransactionDTO() {
+    public UserBalanceTransDTO() {
+        this.transactions = new LinkedList<>();
     }
 
-    public UserBalanceTransactionDTO(Integer userId, String username, Integer cashableAmount, Integer bonusAmount) {
+    public UserBalanceTransDTO(Integer userId, String username, Float cashableAmount, Float bonusAmount) {
         this.userId = userId;
         this.username = username;
         this.cashableAmount = cashableAmount;
         this.bonusAmount = bonusAmount;
+        this.transactions = new LinkedList<>();
     }
 
     public String getUsername() {
@@ -25,19 +31,19 @@ public class UserBalanceTransactionDTO {
         this.username = username;
     }
 
-    public Integer getCashableAmount() {
+    public Float getCashableAmount() {
         return cashableAmount;
     }
 
-    public void setCashableAmount(Integer cashableAmount) {
+    public void setCashableAmount(Float cashableAmount) {
         this.cashableAmount = cashableAmount;
     }
 
-    public Integer getBonusAmount() {
+    public Float getBonusAmount() {
         return bonusAmount;
     }
 
-    public void setBonusAmount(Integer bonusAmount) {
+    public void setBonusAmount(Float bonusAmount) {
         this.bonusAmount = bonusAmount;
     }
 
@@ -49,6 +55,12 @@ public class UserBalanceTransactionDTO {
         this.userId = userId;
     }
 
+    public List<TransactionDTO> getTransactions() {
+        return transactions;
+    }
 
+    public void setTransactions(List<TransactionDTO> transactions) {
+        this.transactions = transactions;
+    }
     // TODO: Fai una classe ad hoc (ATTENZIONE: non deve essere uguale a quella dell'entity!) per gestirti tutte le transazioni
 }

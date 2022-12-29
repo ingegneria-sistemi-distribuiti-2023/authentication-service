@@ -17,10 +17,10 @@ public class Balance {
     private Integer id;
 
     @Column
-    private Integer cashable;
+    private Float cashable;
 
     @Column
-    private Integer bonus;
+    private Float bonus;
 
     @Column(name = "user_id")
     private Integer userId;

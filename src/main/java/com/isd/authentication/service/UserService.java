@@ -29,8 +29,8 @@ public class UserService {
 
         Balance b = new Balance();
         b.setUserId(u.getId());
-        b.setCashable(0);
-        b.setBonus(0);
+        b.setCashable(0.0f);
+        b.setBonus(0.0f);
 
         return u;
     }
