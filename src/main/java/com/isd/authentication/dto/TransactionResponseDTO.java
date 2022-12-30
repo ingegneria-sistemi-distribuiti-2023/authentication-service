@@ -6,19 +6,18 @@ import java.util.Date;
 
 public class TransactionResponseDTO {
 
-    // FIXME:
-    private String status;
+    private TransactionStatus status;
     private String message;
     private Date time;
 
     public TransactionResponseDTO() {
     }
 
-    public String getStatus() {
+    public TransactionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TransactionStatus status) {
         this.status = status;
     }
 

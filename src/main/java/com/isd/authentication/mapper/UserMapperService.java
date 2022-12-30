@@ -48,6 +48,7 @@ public class UserMapperService {
 
         dto.setUserId(user.getId());
         dto.setUsername(user.getUsername());
+        dto.setEnabled(user.getEnabled());
 
         Balance currB = br.findByUserId(user.getId());
 
@@ -69,6 +70,7 @@ public class UserMapperService {
         User newuser = new User();
         newuser.setUsername(current.getUsername());
         newuser.setPassword(current.getPassword());
+        newuser.setEnabled(true);
         ur.save(newuser);
 
         Balance balance = new Balance();
@@ -77,27 +79,27 @@ public class UserMapperService {
         balance.setCashable(0.0f);
         br.save(balance);
 
-        UserBalanceDTO toRet = new UserBalanceDTO(newuser.getId(), newuser.getUsername(), balance.getCashable(), balance.getBonus());
+        UserBalanceDTO toRet = new UserBalanceDTO(newuser.getId(), newuser.getUsername(), balance.getCashable(), balance.getBonus(), newuser.getEnabled());
 
         return toRet;
     }
 
     public UserBalanceDTO deleteUser(Integer id) throws Exception {
-
-        // TODO:
-        // Solo per testare eliminazione. Aggiungi uno STATUS e metti 'enabled' per disattivare l'utenza
-
         User current = ur.findOneById(id);
 
         if (current == null){
             throw new Exception("User not found");
         }
 
+        current.setEnabled(false);
+        ur.save(current);
+
+        // added only for test if works elimination on db
         UserBalanceDTO toRet = this.convertToDTO(current);
 
-        tr.deleteAllByUserId(current.getId());
-        br.deleteByUserId(current.getId());
-        ur.delete(current);
+//        tr.deleteAllByUserId(current.getId());
+//        br.deleteByUserId(current.getId());
+//        ur.delete(current);
 
         return toRet;
 
@@ -114,12 +116,12 @@ public class UserMapperService {
 
         toRet.setUserId(usr.getId());
         toRet.setUsername(usr.getUsername());
+        toRet.setEnabled(usr.getEnabled());
 
         Balance bal = br.findByUserId(toRet.getUserId());
 
         toRet.setBonusAmount(bal.getBonus());
         toRet.setCashableAmount(bal.getCashable());
-
         List<Transaction> allTrs = tr.findAllByUserId(id);
 
         List<TransactionDTO> allTrsDto = new LinkedList<>();
@@ -145,13 +147,13 @@ public class UserMapperService {
         Transaction newtr = new Transaction();
 
         // TODO: add timer to simulate process
-
+        newtr.setUserId(usr.getId());
+        newtr.setDate(new Date());
         newtr.setCircuit(request.getCircuit());
         newtr.setAmount(request.getAmount());
-        newtr.setUserId(usr.getId());
 
         // TODO: add logic to handle status
-        newtr.setStatus(TransactionStatus.CLOSED.toString());
+        newtr.setStatus(TransactionStatus.CLOSED);
         tr.save(newtr);
 
         Balance currBal = br.findByUserId(usr.getId());

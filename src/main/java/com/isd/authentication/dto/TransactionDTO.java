@@ -1,6 +1,7 @@
 package com.isd.authentication.dto;
 
 import com.isd.authentication.commons.TransactionStatus;
+import com.isd.authentication.domain.Transaction;
 
 import java.util.Date;
 
@@ -10,8 +11,7 @@ public class TransactionDTO {
     private Integer userId;
     private Float amount;
     private String circuit;
-    // FIXME:
-    private String status;
+    private TransactionStatus status;
 
     public TransactionDTO() {
     }
@@ -48,11 +48,11 @@ public class TransactionDTO {
         this.circuit = circuit;
     }
 
-    public String getStatus() {
+    public TransactionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TransactionStatus status) {
         this.status = status;
     }
 }

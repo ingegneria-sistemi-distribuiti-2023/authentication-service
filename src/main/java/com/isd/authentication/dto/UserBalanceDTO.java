@@ -9,15 +9,17 @@ public class UserBalanceDTO {
     private String username;
     private Float cashableAmount;
     private Float bonusAmount;
+    private Boolean enabled;
 
     public UserBalanceDTO() {
     }
 
-    public UserBalanceDTO(Integer userId, String username, Float cashableAmount, Float bonusAmount) {
+    public UserBalanceDTO(Integer userId, String username, Float cashableAmount, Float bonusAmount, Boolean enabled) {
         this.userId = userId;
         this.username = username;
         this.cashableAmount = cashableAmount;
         this.bonusAmount = bonusAmount;
+        this.enabled = enabled;
     }
 
     public String getUsername() {
@@ -52,5 +54,10 @@ public class UserBalanceDTO {
         this.userId = userId;
     }
 
-    // TODO: Fai una classe ad hoc (ATTENZIONE: non deve essere uguale a quella dell'entity!) per gestirti tutte le transazioni
+    public Boolean getEnabled() {
+        return enabled;
+    }
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
 }

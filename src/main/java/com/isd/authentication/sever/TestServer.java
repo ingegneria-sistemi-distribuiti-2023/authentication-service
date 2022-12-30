@@ -1,13 +1,19 @@
 package com.isd.authentication.sever;
 
 
-import com.isd.authentication.repository.UserRepository;
+import com.isd.authentication.dto.UserBalanceDTO;
+import com.isd.authentication.mapper.UserMapperService;
+import java.util.List;
 
 public class TestServer {
     // local test
     public static void main(String[] args) {
         try {
-            // TODO:
+            // TODO: ritorna un errore quando lo avvio così, perché? devo forse implementare come ha fatto il prof ? Chiedere.
+            UserMapperService service1 = new UserMapperService();
+
+            List<UserBalanceDTO> users = service1.getAll();
+            System.out.println(users.size());
 //            UserServiceR userServiceR = new UserServiceImp();
 //            UserDTO myDto = userServiceR.findById(1);
 

@@ -29,16 +29,10 @@ public class Transaction {
     private Float amount;
 
     @Column(nullable = false, length = 45)
-    private String status; // FIXME: swap to enum
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus status;
 
     @Column()
     private Date date;
-
-    // TODO: non necessario al momento
-//    @OneToOne(
-//            mappedBy = "userTransactions",
-//            fetch = FetchType.LAZY
-//    )
-//    private User userTransactions;
 
 }

@@ -25,8 +25,4 @@ public class Balance {
     @Column(name = "user_id")
     private Integer userId;
 
-    // TODO: non necessaria al momento ....
-//    @OneToOne(mappedBy = "userBalance", fetch = FetchType.LAZY)
-//    private User userBalance;
-
 }

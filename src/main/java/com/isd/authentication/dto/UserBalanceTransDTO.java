@@ -9,17 +9,19 @@ public class UserBalanceTransDTO {
     private String username;
     private Float cashableAmount;
     private Float bonusAmount;
+    private Boolean enabled;
     private List<TransactionDTO> transactions;
 
     public UserBalanceTransDTO() {
         this.transactions = new LinkedList<>();
     }
 
-    public UserBalanceTransDTO(Integer userId, String username, Float cashableAmount, Float bonusAmount) {
+    public UserBalanceTransDTO(Integer userId, String username, Float cashableAmount, Float bonusAmount, Boolean enabled) {
         this.userId = userId;
         this.username = username;
         this.cashableAmount = cashableAmount;
         this.bonusAmount = bonusAmount;
+        this.enabled = enabled;
         this.transactions = new LinkedList<>();
     }
 
@@ -62,5 +64,12 @@ public class UserBalanceTransDTO {
     public void setTransactions(List<TransactionDTO> transactions) {
         this.transactions = transactions;
     }
-    // TODO: Fai una classe ad hoc (ATTENZIONE: non deve essere uguale a quella dell'entity!) per gestirti tutte le transazioni
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
 }
