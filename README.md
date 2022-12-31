@@ -17,7 +17,7 @@ After starting the application it is accessible under `localhost:8080`.
 The application can be built using the following command:
 
 ```
-mvnw clean package
+mvn clean package
 ```
 
 The application can then be started with the following command - here with the profile `production`:
@@ -28,6 +28,6 @@ java -Dspring.profiles.active=production -jar ./target/authentication-service-0.
 
 ## Further readings
 
-* [Maven docs](https://maven.apache.org/guides/index.html)  
-* [Spring Boot reference](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)  
-* [Spring Data JPA reference](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)  
+* [Maven docs](https://maven.apache.org/guides/index.html)
+* [Spring Boot reference](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)
+* [Spring Data JPA reference](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)
