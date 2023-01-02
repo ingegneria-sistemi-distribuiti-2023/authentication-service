@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.7'
 
 services:
   authentication_db:
@@ -15,8 +15,8 @@ services:
       MYSQL_USER: admin1
       MYSQL_PASSWORD: admin1
     volumes:
-      - "./schema.sql:/docker-entrypoint-initdb.d/1.sql"
-      - "./data.sql:/docker-entrypoint-initdb.d/2.sql"
+      - "./db/schema.sql:/docker-entrypoint-initdb.d/1.sql"
+      - "./db/data.sql:/docker-entrypoint-initdb.d/2.sql"
     healthcheck:
       test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
       start_period: 5s
