@@ -1,4 +1,4 @@
-package com.isd.authentication.mapper;
+package com.isd.authentication.converter;
 
 import com.isd.authentication.domain.Transaction;
 import com.isd.authentication.dto.TransactionDTO;
@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class TransactionMapperService {
+public class TransactionConverter {
 
     public TransactionDTO convertToDTO(Transaction transaction){
         TransactionDTO dto = new TransactionDTO();

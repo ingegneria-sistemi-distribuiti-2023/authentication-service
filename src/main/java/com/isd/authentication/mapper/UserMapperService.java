@@ -1,6 +1,7 @@
 package com.isd.authentication.mapper;
 
 import com.isd.authentication.commons.TransactionStatus;
+import com.isd.authentication.converter.TransactionConverter;
 import com.isd.authentication.domain.Balance;
 import com.isd.authentication.domain.Transaction;
 import com.isd.authentication.domain.User;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
  * and dto ( has the role of assembler ? )
  *
  * **/
+// TODO: Da rinominare in converter
 @Service
 @Transactional
 public class UserMapperService {
@@ -37,7 +39,7 @@ public class UserMapperService {
     private TransactionRepository tr;
 
     @Autowired
-    TransactionMapperService trmps;
+    TransactionConverter trmps;
 
     public List<UserBalanceDTO> getAll() {
         return ur.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
