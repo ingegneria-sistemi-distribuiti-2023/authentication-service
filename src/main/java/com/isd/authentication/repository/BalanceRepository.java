@@ -9,4 +9,6 @@ public interface BalanceRepository extends JpaRepository<Balance, Integer> {
     Balance findByUserId(Integer id);
 
     void deleteByUserId(Integer userId);
+
+    boolean existsByUserId(Integer id);
 }

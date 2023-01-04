@@ -24,5 +24,18 @@ public class User {
 
     @Column(name = "enabled")
     private Boolean enabled;
-    
+
+    /**
+     * Mandatory to handle tests
+     * */
+    @Override
+    public boolean equals(Object obj) {
+        boolean same = false;
+
+        if (obj != null && obj instanceof User){
+            same = this.id == ((User) obj).getId() && this.username == ((User) obj).getUsername() && this.password == ((User) obj).getPassword() && this.enabled == ((User) obj).getEnabled();
+        }
+
+        return same;
+    }
 }

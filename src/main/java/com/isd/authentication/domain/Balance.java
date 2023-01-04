@@ -24,5 +24,22 @@ public class Balance {
 
     @Column(name = "user_id")
     private Integer userId;
+    
+    /**
+     * Mandatory to handle tests
+     * */
+    @Override
+    public boolean equals(Object obj) {
+        boolean same = false;
+
+        if (obj != null && obj instanceof Balance){
+            same = this.id == ((Balance) obj).getId() &&
+                    this.cashable == ((Balance) obj).getCashable() &&
+                    this.bonus == ((Balance) obj).getBonus() &&
+                    this.userId == ((Balance) obj).getUserId();
+        }
+
+        return same;
+    }
 
 }
