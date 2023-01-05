@@ -10,6 +10,6 @@ FROM openjdk:17.0.1-jdk-slim
 WORKDIR /app
 # Copy the executable JAR from the maven stage to the current stage
 COPY --from=maven /usr/src/app/target/authentication-service-0.0.1-SNAPSHOT.jar /app
-ENV SERVER_PORT 8081
+ENV SERVER_PORT 8082
 EXPOSE $SERVER_PORT
 ENTRYPOINT ["java", "-jar", "authentication-service-0.0.1-SNAPSHOT.jar" ]

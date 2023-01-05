@@ -20,4 +20,4 @@ spring:
         id:
           new_generator_mappings: true
 server:
-  port: 8081
+  port: 8082

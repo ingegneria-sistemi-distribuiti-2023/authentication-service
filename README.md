@@ -10,7 +10,7 @@ Update your local database connection in `application.yml` or create your own `a
 
 Lombok must be supported by your IDE. For this, in IntelliJ install the Lombok plugin and enable annotation processing - [learn more](https://bootify.io/intellij/spring-boot-with-lombok.html).
 
-After starting the application it is accessible under `localhost:8080`.
+After starting the application it is accessible under `localhost:8082`.
 
 ## Build
 

@@ -1,9 +1,9 @@
 
 
 ###
-GET http://localhost:8081/user/ HTTP/1.1
+GET http://localhost:8082/user/ HTTP/1.1
 
 
 ###
-GET http://localhost:8081/user/findbyid?userId=1 HTTP/1.1
+GET http://localhost:8082/user/findbyid?userId=1 HTTP/1.1
 content-type: application/json

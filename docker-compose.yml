@@ -11,13 +11,16 @@ services:
     image: authentication-service:latest
     restart: always
     ports:
-      - 8081:8081
+      - 8082:8082
     environment:
       JDBC_DATABASE_URL: jdbc:mysql://authentication_db:3306/authdb?allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC
       JDBC_DATABASE_PASSWORD: admin
       JDBC_DATABASE_USERNAME: admin
     networks:
       - authentication-network
+      - authentication-db-network
 networks: 
   authentication-network:
     name: authentication-network
+  authentication-db-network:
+    name: authentication-db-network
