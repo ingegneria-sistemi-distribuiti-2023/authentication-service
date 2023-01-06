@@ -19,8 +19,13 @@ services:
     networks:
       - authentication-network
       - authentication-db-network
+    volumes:
+      - maven_packages:/root/.m2
 networks: 
   authentication-network:
     name: authentication-network
   authentication-db-network:
     name: authentication-db-network
+volumes:
+  maven_packages:
+    name: maven_packages
