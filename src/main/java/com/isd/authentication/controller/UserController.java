@@ -1,18 +1,18 @@
 package com.isd.authentication.controller;
 
 import com.isd.authentication.dto.*;
-import com.isd.authentication.mapper.UserMapperService;
+import com.isd.authentication.service.UserService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/auth/user")
 public class UserController {
 
     @Autowired
-    private UserMapperService umps;
+    private UserService umps;
 
     // FIXME: conviene utilizzare lo userService nello User Controller ? Credo non sia necessario
     // Dato che abbiamo già usermapperService però chiedi conferma, moolto probabilmente sono la stessa cosa !!!
@@ -20,14 +20,14 @@ public class UserController {
 //    private UserService us;
 
     @GetMapping(path="/")
-    public @ResponseBody Iterable<UserBalanceDTO> getAllUsers(){
+    public @ResponseBody Iterable<UserBalanceDTO> getAllUsers() throws Exception{
         return umps.getAll();
     }
 
 
-    @GetMapping(path="/findbyid")
+    @GetMapping(path="/{id}")
     public @ResponseBody
-    UserBalanceTransDTO getUserById(@RequestParam @NotNull Integer userId) throws Exception{
+    UserBalanceTransDTO getUserById(@PathVariable("id") Integer userId) throws Exception{
         return umps.findUserById(userId);
     }
 

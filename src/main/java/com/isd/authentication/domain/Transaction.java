@@ -1,6 +1,7 @@
 package com.isd.authentication.domain;
 
 import com.isd.authentication.commons.TransactionStatus;
+import com.isd.authentication.commons.TransactionType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,6 +35,11 @@ public class Transaction {
 
     @Column()
     private Date date;
+
+//    ho usato category per evitare 'type' parola riservata
+    @Column(name = "category")
+    @Enumerated(EnumType.STRING)
+    private TransactionType category;
 
     /**
      * Mandatory to handle tests

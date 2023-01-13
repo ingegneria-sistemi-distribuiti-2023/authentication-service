@@ -6,11 +6,10 @@ import com.isd.authentication.domain.Transaction;
 import com.isd.authentication.domain.User;
 import com.isd.authentication.dto.TransactionDTO;
 import com.isd.authentication.dto.TransactionResponseDTO;
-import com.isd.authentication.mapper.UserMapperService;
+import com.isd.authentication.service.UserService;
 import com.isd.authentication.repository.BalanceRepository;
 import com.isd.authentication.repository.TransactionRepository;
 import com.isd.authentication.repository.UserRepository;
-import com.isd.authentication.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,12 +37,9 @@ public class UsersAppTest {
     @Mock
     TransactionRepository transactionRepository;
 
-    @InjectMocks
-    UserService userService;
-
     // TODO: Credo che dovrai eliminare quello di sopra semplice e convertire questo in semplice 'Service', dato che hai già la classe converter. Verifica e procedi con la modifica dopo che il prof da conferma
     @InjectMocks
-    UserMapperService userMapperService;
+    UserService userMapperService;
 
     @Before
     public void setup() {
@@ -74,7 +70,7 @@ public class UsersAppTest {
         when(userRepository.findAll()).thenReturn(users);
 
         // Chiama il metodo getAll
-        Iterable<User> result = userService.getAll();
+        Iterable<User> result = userMapperService.getAllEntity();
 
         // Verifica che il mock object sia stato utilizzato correttamente
         verify(userRepository).findAll();
@@ -108,7 +104,7 @@ public class UsersAppTest {
         });
 
         // Chiama il metodo create
-        User createdUser = userService.create(user);
+        User createdUser = userMapperService.create(user);
 
         // Verifica che il mock object sia stato utilizzato correttamente
         verify(userRepository).save(any(User.class));
