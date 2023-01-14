@@ -1,6 +1,7 @@
 package com.isd.authentication.dto;
 
 import com.isd.authentication.commons.TransactionStatus;
+import com.isd.authentication.commons.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,5 +20,6 @@ public class TransactionDTO {
     private Float amount;
     private String circuit;
     private TransactionStatus status;
+    private TransactionType type;
 
 }

@@ -1,11 +1,13 @@
 package com.isd.authentication;
 
+import com.isd.authentication.commons.Role;
 import com.isd.authentication.commons.TransactionStatus;
+import com.isd.authentication.commons.TransactionType;
+import com.isd.authentication.converter.TransactionConverter;
 import com.isd.authentication.domain.Balance;
 import com.isd.authentication.domain.Transaction;
 import com.isd.authentication.domain.User;
-import com.isd.authentication.dto.TransactionDTO;
-import com.isd.authentication.dto.TransactionResponseDTO;
+import com.isd.authentication.dto.*;
 import com.isd.authentication.service.UserService;
 import com.isd.authentication.repository.BalanceRepository;
 import com.isd.authentication.repository.TransactionRepository;
@@ -20,7 +22,10 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -29,142 +34,204 @@ import static org.mockito.Mockito.*;
 public class UsersAppTest {
 
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Mock
-    BalanceRepository balanceRepository;
+    private BalanceRepository balanceRepository;
 
     @Mock
-    TransactionRepository transactionRepository;
+    private TransactionRepository transactionRepository;
 
-    // TODO: Credo che dovrai eliminare quello di sopra semplice e convertire questo in semplice 'Service', dato che hai già la classe converter. Verifica e procedi con la modifica dopo che il prof da conferma
+    @Mock
+    private TransactionConverter transactionConverter;
+
     @InjectMocks
-    UserService userMapperService;
-
-    @Before
-    public void setup() {
-        // initialize i mock object
-        MockitoAnnotations.initMocks(this);
-    }
+    private UserService userService;
 
     @Test
-    public void testGetAll() {
-
-        // Configura il comportamento del mock object userRepository
-        List<User> users = new ArrayList<>();
-
-        // Crea alcuni utenti di test
+    public void getAll_shouldReturnAllUsers() throws Exception {
         User user1 = new User();
         user1.setId(1);
         user1.setUsername("user1");
-        user1.setPassword("password");
         user1.setEnabled(true);
-        users.add(user1);
+
         User user2 = new User();
         user2.setId(2);
         user2.setUsername("user2");
-        user2.setPassword("password");
-        user2.setEnabled(true);
-        users.add(user2);
+        user2.setEnabled(false);
 
-        when(userRepository.findAll()).thenReturn(users);
+        List<User> allUsers = Arrays.asList(user1, user2);
+        when(userRepository.findAll()).thenReturn(allUsers);
 
-        // Chiama il metodo getAll
-        Iterable<User> result = userMapperService.getAllEntity();
+        Balance balance1 = new Balance();
+        balance1.setUserId(1);
+        balance1.setCashable(100f);
+        balance1.setBonus(50f);
 
-        // Verifica che il mock object sia stato utilizzato correttamente
-        verify(userRepository).findAll();
+        Balance balance2 = new Balance();
+        balance2.setUserId(2);
+        balance2.setCashable(200f);
+        balance2.setBonus(100f);
 
-        // Verifica che gli utenti restituiti siano quelli attesi
-        List<User> userList = new ArrayList<>();
-        result.forEach(userList::add);
-        assertEquals(2, userList.size());
-        assertTrue(userList.contains(users.get(0)));
-        assertTrue(userList.contains(users.get(1)));
+        when(balanceRepository.findByUserId(1)).thenReturn(balance1);
+        when(balanceRepository.findByUserId(2)).thenReturn(balance2);
+
+        List<UserBalanceDTO> result = userService.getAll();
+
+        assertEquals(2, result.size());
+        assertEquals(1, result.get(0).getUserId());
+        assertEquals("user1", result.get(0).getUsername());
+        assertTrue(result.get(0).getEnabled());
+        assertEquals(100, result.get(0).getCashableAmount());
+        assertEquals(50, result.get(0).getBonusAmount());
+
+        assertEquals(2, result.get(1).getUserId());
+        assertEquals("user2", result.get(1).getUsername());
+        assertFalse(result.get(1).getEnabled());
+        assertEquals(200, result.get(1).getCashableAmount());
+        assertEquals(100, result.get(1).getBonusAmount());
     }
 
     @Test
-    public void testCreate() {
-        // Configura il comportamento del mock object userRepository
-        User user = new User();
-        user.setUsername("newuser");
-        user.setPassword("password");
-        user.setEnabled(true);
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
-            User savedUser = (User) invocation.getArgument(0);
-            savedUser.setId(1);
-            return savedUser;
-        });
+    public void createUserEntity_shouldCreateUser() throws Exception {
+        UserRegistrationDTO userDto = new UserRegistrationDTO();
 
-        // Configura il comportamento del mock object balanceRepository
-        when(balanceRepository.save(any(Balance.class))).thenAnswer(invocation -> {
-            Balance balance = (Balance) invocation.getArgument(0);
-            balance.setId(1);
-            return balance;
-        });
+        userDto.setUsername("testuser");
+        userDto.setPassword("testpassword");
+        User newUser = new User();
+        newUser.setUsername("testuser");
+        newUser.setPassword("testpassword");
+        newUser.setEnabled(true);
+        newUser.setRole(Role.USER);
 
-        // Chiama il metodo create
-        User createdUser = userMapperService.create(user);
+        when(userRepository.findByUsername("testuser")).thenReturn(null);
+        when(userRepository.save(newUser)).thenReturn(newUser);
 
-        // Verifica che il mock object sia stato utilizzato correttamente
-        verify(userRepository).save(any(User.class));
-        verify(balanceRepository).save(any(Balance.class));
+        Balance balance = new Balance();
+        balance.setUserId(newUser.getId());
+        balance.setCashable(0.0f);
+        balance.setBonus(0.0f);
 
-        // Verifica che l'utente sia stato creato correttamente
-        assertNotNull(createdUser.getId());
-        assertEquals("newuser", createdUser.getUsername());
+        when(balanceRepository.save(balance)).thenReturn(balance);
 
-        // Verifica che sia stato creato un oggetto Balance per l'utente appena creato
-        ArgumentCaptor<Balance> balanceCaptor = ArgumentCaptor.forClass(Balance.class);
-        verify(balanceRepository).save(balanceCaptor.capture());
-        Balance balance = balanceCaptor.getValue();
-        assertNotNull(balance.getId());
-        assertEquals(1, balance.getUserId());
-        assertEquals(0.0f, balance.getCashable(), 0.01f);
-        assertEquals(0.0f, balance.getBonus(), 0.01f);
+        User result = userService.createUserEntity(userDto);
+
+        assertEquals("testuser", result.getUsername());
+        assertEquals("testpassword", result.getPassword());
+        assertEquals(Role.USER, result.getRole());
+        assertTrue(result.getEnabled());
+    }
+
+
+    @Test
+    public void createUserEntity_shouldThrowException_whenUsernameAlreadyUsed() throws Exception {
+        UserRegistrationDTO userDto = new UserRegistrationDTO();
+        userDto.setUsername("testuser");
+        userDto.setPassword("testpassword");
+
+        User existingUser = new User();
+        existingUser.setUsername("testuser");
+
+        when(userRepository.findByUsername("testuser")).thenReturn(java.util.Optional.of(existingUser));
+        assertThrows(Exception.class, () -> userService.createUserEntity(userDto), "Username already used");
     }
 
     @Test
-    public void testRecharge() throws Exception {
-        // Configura il comportamento del mock object userRepository
+    public void disableOrEnable_shouldDisableUser() throws Exception {
         User user = new User();
         user.setId(1);
-        user.setUsername("user1");
-        user.setPassword("password");
+        user.setUsername("testuser");
         user.setEnabled(true);
-        when(userRepository.findOneById(1)).thenReturn(user);
 
-        // Configura il comportamento del mock object balanceRepository
+        when(userRepository.findById(1)).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+
         Balance balance = new Balance();
         balance.setUserId(1);
-        balance.setCashable(50.0f);
-//        when(balanceRepository.findByUserId(1)).thenReturn(Optional.of(balance));
+        balance.setCashable(100f);
+        balance.setBonus(50f);
+
         when(balanceRepository.findByUserId(1)).thenReturn(balance);
 
-        // Crea una richiesta di ricarica di test
-        TransactionDTO request = new TransactionDTO();
-        request.setUserId(1);
-        request.setCircuit("Visa");
-        request.setAmount(100.0f);
+        UserBalanceDTO result = userService.disableOrEnable(1, false);
 
-        // Chiama il metodo recharge
-        TransactionResponseDTO response = userMapperService.recharge(request);
-
-        // Verifica che il mock object sia stato utilizzato correttamente
-        verify(userRepository).findOneById(1);
-        verify(balanceRepository).findByUserId(1);
-        verify(transactionRepository).save(any(Transaction.class));
-        verify(balanceRepository).save(any(Balance.class));
-
-        // Verifica che la risposta sia quella attesa
-        assertEquals("Successful increase", response.getMessage());
-        assertEquals(TransactionStatus.CLOSED, response.getStatus());
-        assertNotNull(response.getTime());
-
-        // Verifica che il saldo sia stato aggiornato correttamente
-        ArgumentCaptor<Balance> balanceCaptor = ArgumentCaptor.forClass(Balance.class);
-        verify(balanceRepository).save(balanceCaptor.capture());
-        Balance updatedBalance = balanceCaptor.getValue();
-        assertEquals(150.0f, updatedBalance.getCashable(), 0.01f);
+        assertEquals(1, result.getUserId());
+        assertEquals("testuser", result.getUsername());
+        assertFalse(result.getEnabled());
+        assertEquals(100f, result.getCashableAmount());
+        assertEquals(50f, result.getBonusAmount());
     }
+
+    @Test
+    public void disableOrEnable_shouldThrowException_whenUserNotFound() throws Exception {
+        when(userRepository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(Exception.class, () -> userService.disableOrEnable(1, false), "User not found");
+    }
+
+
+    @Test
+    public void findUserById_shouldReturnUserWithTransactions() throws Exception {
+        User user = new User();
+        user.setId(1);
+        user.setUsername("testuser");
+        user.setEnabled(true);
+
+        when(userRepository.findById(1)).thenReturn(Optional.of(user));
+
+        Balance balance = new Balance();
+        balance.setUserId(1);
+        balance.setCashable(100f);
+        balance.setBonus(50f);
+
+        when(balanceRepository.findByUserId(1)).thenReturn(balance);
+        Transaction transaction1 = new Transaction();
+        transaction1.setId(1);
+        transaction1.setUserId(1);
+        transaction1.setAmount(20f);
+        transaction1.setCategory(TransactionType.DEPOSIT);
+
+        Transaction transaction2 = new Transaction();
+        transaction2.setId(2);
+        transaction2.setUserId(1);
+        transaction2.setAmount(30f);
+        transaction2.setCategory(TransactionType.WITHDRAW);
+
+        when(transactionRepository.findAllByUserId(1)).thenReturn(Arrays.asList(transaction1, transaction2));
+
+        TransactionDTO transactionDto1 = new TransactionDTO();
+        transactionDto1.setAmount(20f);
+        transactionDto1.setType(TransactionType.DEPOSIT);
+
+        TransactionDTO transactionDto2 = new TransactionDTO();
+        transactionDto2.setAmount(30f);
+        transactionDto2.setType(TransactionType.WITHDRAW);
+
+        when(transactionConverter.convertToDTO(transaction1)).thenReturn(transactionDto1);
+        when(transactionConverter.convertToDTO(transaction2)).thenReturn(transactionDto2);
+
+        UserBalanceTransDTO result = userService.findUserById(1);
+
+        assertEquals(1, result.getUserId());
+        assertEquals("testuser", result.getUsername());
+        assertTrue(result.getEnabled());
+        assertEquals(100, result.getCashableAmount());
+        assertEquals(50, result.getBonusAmount());
+        assertEquals(2, result.getTransactions().size());
+        assertEquals(20, result.getTransactions().get(0).getAmount());
+        assertEquals(TransactionType.DEPOSIT, result.getTransactions().get(0).getType());
+        assertEquals(30, result.getTransactions().get(1).getAmount());
+        assertEquals(TransactionType.WITHDRAW, result.getTransactions().get(1).getType());
+    }
+
+    @Test
+    public void findUserById_shouldThrowException_whenUserNotFound() throws Exception {
+        when(userRepository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(Exception.class, () -> userService.findUserById(1), "User not found");
+    }
+
+
+
+
 }
