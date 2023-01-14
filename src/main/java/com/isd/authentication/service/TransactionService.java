@@ -32,31 +32,35 @@ public class TransactionService {
 
     Transaction transaction;
 
-    public TransactionResponseDTO deposit(TransactionRequestDTO request)  throws Exception{
-        TransactionResponseDTO toRet = new TransactionResponseDTO();
-        transaction = new Transaction();
-        transaction.setCategory(TransactionType.DEPOSIT);
+    Balance balance;
 
-        if (request.getAmount() <= 0 || request.getCircuit() == null || request.getCircuit() == null){
+    private void processTransaction(TransactionRequestDTO request, TransactionType type) throws Exception {
+        if (request.getAmount() <= 0 || request.getCircuit() == null || request.getCircuit() == null) {
             throw new Exception("Something wrong on request");
         }
         User user = ur.findOneById(request.getUserId());
-        if (user == null || user.getEnabled() == false){
+        if (user == null || user.getEnabled() == false) {
             throw new Exception("User not found or not enabled");
         }
 
-        Balance balance = br.findByUserId(user.getId());
-        if (balance == null){
+        balance = br.findByUserId(user.getId());
+        if (balance == null) {
             throw new Exception("Balance not found");
         }
 
+        transaction = new Transaction();
+        transaction.setCategory(type);
         transaction.setUserId(user.getId());
         transaction.setCircuit(request.getCircuit());
         transaction.setAmount(request.getAmount());
         transaction.setStatus(TransactionStatus.OPEN);
         transaction.setDate(new Date());
         tr.save(transaction);
+    }
 
+    public TransactionResponseDTO deposit(TransactionRequestDTO request)  throws Exception{
+        TransactionResponseDTO toRet = new TransactionResponseDTO();
+        processTransaction(request,TransactionType.DEPOSIT);
         Float currentBalanceCashable = balance.getCashable();
         Float updatedBalanceCashable = currentBalanceCashable + request.getAmount();
         balance.setCashable(updatedBalanceCashable);
@@ -72,33 +76,10 @@ public class TransactionService {
 
     public TransactionResponseDTO withdraw(TransactionRequestDTO request) throws Exception {
         TransactionResponseDTO toRet = new TransactionResponseDTO();
-        transaction = new Transaction();
-        transaction.setCategory(TransactionType.WITHDRAW);
-
-        if (request.getAmount() <= 0 || request.getCircuit() == null || request.getCircuit() == null) {
-            throw new Exception("Something wrong on request");
-        }
-        User user = ur.findOneById(request.getUserId());
-        if (user == null || user.getEnabled() == false) {
-            throw new Exception("User not found or not enabled");
-        }
-
-        Balance balance = br.findByUserId(user.getId());
-        if (balance == null) {
-            throw new Exception("Balance not found");
-        }
-
+        processTransaction(request,TransactionType.WITHDRAW);
         if(request.getAmount() > balance.getCashable()) {
             throw new Exception("Insufficient funds on balance");
         }
-
-        transaction.setUserId(user.getId());
-        transaction.setCircuit(request.getCircuit());
-        transaction.setAmount(request.getAmount());
-        transaction.setStatus(TransactionStatus.OPEN);
-        transaction.setDate(new Date());
-        tr.save(transaction);
-
         Float currentBalanceCashable = balance.getCashable();
         Float updatedBalanceCashable = currentBalanceCashable - request.getAmount();
         balance.setCashable(updatedBalanceCashable);
