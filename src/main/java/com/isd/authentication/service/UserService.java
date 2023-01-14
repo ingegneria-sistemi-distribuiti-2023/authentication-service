@@ -1,5 +1,6 @@
 package com.isd.authentication.service;
 
+import com.isd.authentication.commons.Role;
 import com.isd.authentication.commons.TransactionStatus;
 import com.isd.authentication.converter.TransactionConverter;
 import com.isd.authentication.converter.UserBalanceConverter;
@@ -63,7 +64,7 @@ public class UserService {
 //        return ur.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    public UserBalanceDTO createUser(UserCreateDTO current) throws Exception{
+    public User createUserEntity(UserRegistrationDTO current) throws Exception{
 
         if (ur.findByUsername(current.getUsername()) != null ) {
             throw new Exception("Username already used");
@@ -73,7 +74,9 @@ public class UserService {
         newuser.setUsername(current.getUsername());
         newuser.setPassword(current.getPassword());
         newuser.setEnabled(true);
-        ur.save(newuser);
+        // TODO: da fare sotto
+        newuser.setRole(Role.USER);
+        User saved = ur.save(newuser);
 
         Balance balance = new Balance();
         balance.setUserId(newuser.getId());
@@ -81,9 +84,8 @@ public class UserService {
         balance.setCashable(0.0f);
         br.save(balance);
 
-        UserBalanceDTO toRet = new UserBalanceDTO(newuser.getId(), newuser.getUsername(), balance.getCashable(), balance.getBonus(), newuser.getEnabled());
 
-        return toRet;
+        return saved;
     }
 
     public UserBalanceDTO deleteUser(Integer id) throws Exception {
@@ -137,41 +139,6 @@ public class UserService {
         toRet.setTransactions(allTrsDto);
 
         return toRet;
-    }
-
-    public TransactionResponseDTO recharge(TransactionDTO request) throws Exception {
-        TransactionResponseDTO response = new TransactionResponseDTO();
-
-        User usr = ur.findOneById(request.getUserId());
-
-        if (usr == null){
-            throw new Exception("User not found");
-        }
-
-        Transaction newtr = new Transaction();
-
-        // TODO: add timer to simulate process
-        newtr.setUserId(usr.getId());
-        newtr.setDate(new Date());
-        newtr.setCircuit(request.getCircuit());
-        newtr.setAmount(request.getAmount());
-
-        // TODO: add logic to handle status
-        newtr.setStatus(TransactionStatus.CLOSED);
-        tr.save(newtr);
-
-        Balance currBal = br.findByUserId(usr.getId());
-
-        Float totCash = currBal.getCashable() + newtr.getAmount();
-
-        currBal.setCashable(totCash);
-        br.save(currBal);
-
-        response.setMessage("Successful increase");
-        response.setTime(new Date());
-        response.setStatus(newtr.getStatus());
-
-        return response;
     }
 
 }

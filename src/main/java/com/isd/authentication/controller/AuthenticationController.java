@@ -1,65 +1,36 @@
 package com.isd.authentication.controller;
 
-import com.isd.authentication.auth.TokenProvider;
-import com.isd.authentication.domain.User;
+import com.isd.authentication.auth.AuthenticationResponse;
+import com.isd.authentication.auth.AuthenticationService;
 import com.isd.authentication.dto.LoginRequest;
-import com.isd.authentication.dto.TokenResponse;
-import com.isd.authentication.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import com.isd.authentication.dto.UserRegistrationDTO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/auth/jwt/")
+@RequiredArgsConstructor
 public class AuthenticationController {
-    @Autowired
-    TokenProvider tokenProvider;
 
-    @Autowired
-    UserRepository ur;
+  private final AuthenticationService service;
 
-    @PostMapping(value = "/authenticate")
-    public @ResponseBody TokenResponse authenticate(@RequestBody LoginRequest request) throws Exception {
-        // Validate the request
-        TokenResponse toRes = new TokenResponse();
+  @PostMapping("/register")
+  public ResponseEntity<AuthenticationResponse> register (
+      @RequestBody UserRegistrationDTO request
+  ) throws Exception {
+    return ResponseEntity.ok(service.register(request));
+  }
 
-        try {
+  @PostMapping("/login")
+  public ResponseEntity<AuthenticationResponse> authenticate(
+      @RequestBody LoginRequest request
+  ) throws Exception{
+    return ResponseEntity.ok(service.authenticate(request));
+  }
 
-            if (!authenticateUser(request.getUserId(), request.getPassword())){
-                throw new Exception("User not found");
-            }
 
-            String jwt = createJWT(request.getUserId());
-
-            toRes.setMessage(jwt);
-
-        } catch (Error e){
-            new Exception(e.getMessage());
-        }
-
-        return toRes;
-    }
-
-    private boolean isRequestValid(String token) {
-        // validate the request here
-        return tokenProvider.isTokenValid(token);
-    }
-
-    private boolean authenticateUser(Integer userId, String password) {
-        // authenticate the user, for example by checking against a database
-
-        User currentUser = ur.findByIdAndPassword(userId, password);
-
-        if (currentUser == null){
-            return false;
-        }
-
-        return true;
-    }
-
-    private String createJWT(Integer id ) { //, String issuer, String subject, long ttlMillis) {
-        // create JWT token
-        return tokenProvider.generateJwt(id);
-    }
 }

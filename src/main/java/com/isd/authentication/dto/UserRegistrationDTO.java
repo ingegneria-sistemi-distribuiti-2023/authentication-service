@@ -1,9 +1,15 @@
 package com.isd.authentication.dto;
 
-/**
- * DTO utilizzato per creare un utente
- */
-public class UserCreateDTO {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserRegistrationDTO {
     private String username;
     private String password;
 

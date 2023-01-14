@@ -3,10 +3,13 @@ package com.isd.authentication.repository;
 import com.isd.authentication.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 
 public interface UserRepository extends JpaRepository<User, Integer> {
     User findOneById(Integer id);
-    User findByUsername(String username);
+    Optional<User> findByUsername(String username);
+    User findOneByUsernameAndPassword(String username, String password );
     User findByIdAndPassword(Integer id, String password);
     User save(User u);
     void delete(User u);

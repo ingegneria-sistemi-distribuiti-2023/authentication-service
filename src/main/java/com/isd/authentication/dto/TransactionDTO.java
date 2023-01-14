@@ -1,10 +1,17 @@
 package com.isd.authentication.dto;
 
 import com.isd.authentication.commons.TransactionStatus;
-import com.isd.authentication.domain.Transaction;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class TransactionDTO {
 
     private Date date;
@@ -13,46 +20,4 @@ public class TransactionDTO {
     private String circuit;
     private TransactionStatus status;
 
-    public TransactionDTO() {
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Float getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Float amount) {
-        this.amount = amount;
-    }
-
-    public String getCircuit() {
-        return circuit;
-    }
-
-    public void setCircuit(String circuit) {
-        this.circuit = circuit;
-    }
-
-    public TransactionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TransactionStatus status) {
-        this.status = status;
-    }
 }

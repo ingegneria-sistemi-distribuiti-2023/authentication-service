@@ -1,4 +1,4 @@
-package com.isd.authentication.dto;
+package com.isd.authentication.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequest {
+public class AuthenticationResponse {
 
-    private String username;
-    String password;
-
+  private String token;
 }
