@@ -54,7 +54,7 @@ public class UserService {
 
     public User createUserEntity(UserRegistrationDTO current) throws Exception{
 
-        if (ur.findByUsername(current.getUsername()) != null ) {
+        if (ur.findByUsername(current.getUsername()) == null ) {
             throw new Exception("Username already used");
         }
 
