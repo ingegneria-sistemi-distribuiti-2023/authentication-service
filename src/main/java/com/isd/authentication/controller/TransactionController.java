@@ -38,7 +38,6 @@ public class TransactionController {
         return toRet;
     }
 
-    // TODO: AL MOMENTO SOLO PER TEST
     @PostMapping(path="/withdraw")
     public @ResponseBody TransactionResponseDTO withdraw(@RequestBody TransactionRequestDTO request) throws Exception {
         TransactionResponseDTO toRet = null;
