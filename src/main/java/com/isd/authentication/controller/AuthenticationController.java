@@ -4,9 +4,11 @@ import com.isd.authentication.auth.AuthenticationResponse;
 import com.isd.authentication.auth.AuthenticationService;
 import com.isd.authentication.dto.LoginRequest;
 import com.isd.authentication.dto.UserRegistrationDTO;
+import com.isd.authentication.dto.ValidationRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,22 +24,16 @@ public class AuthenticationController {
 
   @PostMapping("/register")
   public ResponseEntity<AuthenticationResponse> register (@RequestBody UserRegistrationDTO request) throws Exception {
-    AuthenticationResponse register = null;
-    try {
-      register = service.register(request);
-      LOGGER.info(String.valueOf(register));
-    } catch (Error e){
-      LOGGER.error(e.getMessage());
-    }
-    return ResponseEntity.ok(register);
+    return new ResponseEntity<>(service.register(request), HttpStatus.OK);
   }
 
   @PostMapping("/login")
-  public ResponseEntity<AuthenticationResponse> authenticate(
-      @RequestBody LoginRequest request
-  ) throws Exception{
-    return ResponseEntity.ok(service.authenticate(request));
+  public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody LoginRequest request) throws Exception {
+    return new ResponseEntity<>(service.authenticate(request), HttpStatus.OK);
   }
 
-
+  @PostMapping("/validate")
+  public ResponseEntity<Boolean> validate(@RequestBody ValidationRequest request) throws Exception {
+    return new ResponseEntity<>(service.validateToken(request.getUsername(), request.getJwtToken()), HttpStatus.OK);
+  }
 }

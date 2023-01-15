@@ -122,7 +122,6 @@ public class UsersAppTest {
         assertTrue(result.getEnabled());
     }
 
-
     @Test
     public void createUserEntity_shouldThrowException_whenUsernameAlreadyUsed() throws Exception {
         UserRegistrationDTO userDto = new UserRegistrationDTO();
