@@ -22,16 +22,14 @@ public class AuthenticationController {
 
   @PostMapping("/register")
   public ResponseEntity<AuthenticationResponse> register (@RequestBody UserRegistrationDTO request) throws Exception {
-
+    AuthenticationResponse register = null;
     try {
-      AuthenticationResponse register = service.register(request);
+      register = service.register(request);
       LOGGER.info(String.valueOf(register));
     } catch (Error e){
       LOGGER.error(e.getMessage());
     }
-
-
-    return ResponseEntity.ok(service.register(request));
+    return ResponseEntity.ok(register);
   }
 
   @PostMapping("/login")

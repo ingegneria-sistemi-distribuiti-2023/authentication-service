@@ -36,28 +36,35 @@ public class User implements UserDetails {
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
+    // implemented also for spring userdetails support
     private Role role;
 
+    // implemented for UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // every user has only one role
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
+    // implemented for UserDetails
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    // implemented for UserDetails
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    // implemented for UserDetails
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    // implemented for UserDetails
     @Override
     public boolean isEnabled() {
         return getEnabled();
