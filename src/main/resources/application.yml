@@ -21,3 +21,6 @@ spring:
           new_generator_mappings: true
 server:
   port: 8082
+app:
+  service:
+    secret: pluto
