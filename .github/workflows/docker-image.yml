@@ -23,8 +23,14 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+
+    - name: Run tests
+      run: mvn test --file pom.xml
+    - name: Check test results
+      if: failure()
+      run: exit 1
     - name: Build with Maven
-      run: mvn package --file pom.xml
+      run: mvn package --file pom.xml -Dmaven.test.skip
 
     - name: Log in to Docker Hub
       uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9

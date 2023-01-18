@@ -1,7 +1,6 @@
 package com.isd.authentication;
 
 import com.isd.authentication.commons.Role;
-import com.isd.authentication.commons.TransactionStatus;
 import com.isd.authentication.commons.TransactionType;
 import com.isd.authentication.converter.TransactionConverter;
 import com.isd.authentication.domain.Balance;
@@ -12,16 +11,12 @@ import com.isd.authentication.service.UserService;
 import com.isd.authentication.repository.BalanceRepository;
 import com.isd.authentication.repository.TransactionRepository;
 import com.isd.authentication.repository.UserRepository;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -167,7 +162,6 @@ public class UsersAppTest {
 
         assertThrows(Exception.class, () -> userService.disableOrEnable(1, false), "User not found");
     }
-
 
     @Test
     public void findUserById_shouldReturnUserWithTransactions() throws Exception {
