@@ -2,13 +2,13 @@ version: '3.7'
 
 services:
   authentication-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    image: khalld/authentication-service:latest
     # depends_on: # TODO: this will not be managed by docker-compose if db and service are in different stacks
     #   authentication-db:
     #     condition: service_healthy
-    image: authentication-service:latest
     restart: unless-stopped
     ports:
       - 8082:8082
