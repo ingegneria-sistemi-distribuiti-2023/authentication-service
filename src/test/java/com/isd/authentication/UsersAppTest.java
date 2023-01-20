@@ -126,7 +126,7 @@ public class UsersAppTest {
         User existingUser = new User();
         existingUser.setUsername("testuser");
 
-        when(userRepository.findByUsername("testuser")).thenReturn(java.util.Optional.of(existingUser));
+        when(userRepository.findOneByUsername("testuser")).thenReturn(existingUser);
         assertThrows(Exception.class, () -> userService.createUserEntity(userDto), "Username already used");
     }
 
