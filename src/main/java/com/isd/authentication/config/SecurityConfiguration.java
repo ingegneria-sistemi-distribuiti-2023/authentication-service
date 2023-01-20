@@ -22,18 +22,37 @@ public class SecurityConfiguration {
 	// its bean is implemented in ApplicationConfig
 	private final AuthenticationProvider authenticationProvider;
 
+	private static final String[] AUTH_WHITELIST = {
+			// -- Swagger UI v2
+			"/v2/api-docs",
+			"/swagger-resources",
+			"/swagger-resources/**",
+			"/configuration/ui",
+			"/configuration/security",
+			"/swagger-ui.html",
+			"/webjars/**",
+			// -- Swagger UI v3 (OpenAPI)
+			"/v3/api-docs/**",
+			"/swagger-ui/**"
+			// other public endpoints of your API may be appended to this array
+	};
+
 	/*
 	 * SecurityFilterChain is used by Spring Security to configure the http security
 	 */
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
-				.csrf() // TODO: cercare (CROSS-SITE REQUEST FORGERY)
+				.csrf()
 				.disable() // disable the CSRF (Cross-Site Request Forgery) protection
 
 				.authorizeHttpRequests()
 				.requestMatchers("/auth/jwt/**")
 				.permitAll() // everyone can call the API on subpath /auth/jwt/**
+				.and()
+				.authorizeHttpRequests()
+				.requestMatchers(AUTH_WHITELIST)
+				.permitAll()
 				.anyRequest() // every other request must be authenticated
 				.authenticated()
 				.and()
