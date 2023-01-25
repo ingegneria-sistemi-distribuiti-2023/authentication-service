@@ -10,10 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/auth/jwt/")
@@ -23,17 +22,18 @@ public class AuthenticationController {
   private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationController.class);
 
   @PostMapping("/register")
-  public ResponseEntity<AuthenticationResponse> register (@RequestBody UserRegistrationDTO request) throws Exception {
+  public ResponseEntity<AuthenticationResponse> register (@RequestHeader("Secret-Key") String secret, @RequestBody UserRegistrationDTO request) throws Exception {
     return new ResponseEntity<>(service.register(request), HttpStatus.OK);
   }
 
   @PostMapping("/login")
-  public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody LoginRequest request) throws Exception {
+  public ResponseEntity<AuthenticationResponse> authenticate(@RequestHeader("Secret-Key") String secret, @RequestBody LoginRequest request) throws Exception {TimeUnit.SECONDS.sleep(1);
+//    TimeUnit.SECONDS.sleep(10);
     return new ResponseEntity<>(service.authenticate(request), HttpStatus.OK);
   }
 
   @PostMapping("/validate")
-  public ResponseEntity<Boolean> validate(@RequestBody ValidationRequest request) throws Exception {
+  public ResponseEntity<Boolean> validate(@RequestHeader("Secret-Key") String secret, @RequestBody ValidationRequest request) throws Exception {
     return new ResponseEntity<>(service.validateToken(request.getUsername(), request.getJwtToken()), HttpStatus.OK);
   }
 }

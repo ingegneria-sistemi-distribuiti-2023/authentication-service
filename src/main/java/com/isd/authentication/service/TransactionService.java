@@ -2,16 +2,17 @@ package com.isd.authentication.service;
 
 import com.isd.authentication.commons.TransactionStatus;
 import com.isd.authentication.commons.TransactionType;
+import com.isd.authentication.commons.error.CustomHttpResponse;
+import com.isd.authentication.commons.error.CustomServiceException;
 import com.isd.authentication.domain.Balance;
 import com.isd.authentication.domain.Transaction;
 import com.isd.authentication.domain.User;
-import com.isd.authentication.dto.TransactionDTO;
 import com.isd.authentication.dto.TransactionRequestDTO;
 import com.isd.authentication.dto.TransactionResponseDTO;
 import com.isd.authentication.repository.BalanceRepository;
 import com.isd.authentication.repository.TransactionRepository;
 import com.isd.authentication.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,32 +21,31 @@ import java.util.Date;
 @Service
 @Transactional
 public class TransactionService {
-
-    @Autowired
-    BalanceRepository br;
-
-    @Autowired
-    TransactionRepository tr;
-
-    @Autowired
-    UserRepository ur;
+    private final BalanceRepository br;
+    private final TransactionRepository tr;
+    private final UserRepository ur;
 
     Transaction transaction;
-
     Balance balance;
+
+    public TransactionService(BalanceRepository br, TransactionRepository tr, UserRepository ur) {
+        this.br = br;
+        this.tr = tr;
+        this.ur = ur;
+    }
 
     private void processTransaction(TransactionRequestDTO request, TransactionType type) throws Exception {
         if (request.getAmount() <= 0 || request.getCircuit() == null || request.getCircuit() == null) {
-            throw new Exception("Something wrong on request");
+            throw new CustomServiceException(new CustomHttpResponse(HttpStatus.BAD_REQUEST, "Bad request"));
         }
         User user = ur.findOneById(request.getUserId());
         if (user == null || user.getEnabled() == false) {
-            throw new Exception("User not found or not enabled");
+            throw new CustomServiceException(new CustomHttpResponse(HttpStatus.BAD_REQUEST, "User not found"));
         }
 
         balance = br.findByUserId(user.getId());
         if (balance == null) {
-            throw new Exception("Balance not found");
+            throw new CustomServiceException(new CustomHttpResponse(HttpStatus.BAD_REQUEST, "Balance not found"));
         }
 
         transaction = new Transaction();
@@ -78,7 +78,7 @@ public class TransactionService {
         TransactionResponseDTO toRet = new TransactionResponseDTO();
         processTransaction(request,TransactionType.WITHDRAW);
         if(request.getAmount() > balance.getCashable()) {
-            throw new Exception("Insufficient funds on balance");
+            throw new CustomServiceException(new CustomHttpResponse(HttpStatus.BAD_REQUEST, "Insufficient founds on balance"));
         }
         Float currentBalanceCashable = balance.getCashable();
         Float updatedBalanceCashable = currentBalanceCashable - request.getAmount();

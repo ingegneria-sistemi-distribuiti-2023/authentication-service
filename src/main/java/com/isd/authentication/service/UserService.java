@@ -1,7 +1,8 @@
 package com.isd.authentication.service;
 
 import com.isd.authentication.commons.Role;
-import com.isd.authentication.commons.TransactionStatus;
+import com.isd.authentication.commons.error.CustomHttpResponse;
+import com.isd.authentication.commons.error.CustomServiceException;
 import com.isd.authentication.converter.TransactionConverter;
 import com.isd.authentication.domain.Balance;
 import com.isd.authentication.domain.Transaction;
@@ -10,28 +11,24 @@ import com.isd.authentication.dto.*;
 import com.isd.authentication.repository.BalanceRepository;
 import com.isd.authentication.repository.TransactionRepository;
 import com.isd.authentication.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class UserService {
+    private final UserRepository ur;
+    private final BalanceRepository br;
+    private final TransactionRepository tr;
 
-    @Autowired
-    private UserRepository ur;
-
-    @Autowired
-    private BalanceRepository br;
-
-    @Autowired
-    private TransactionRepository tr;
-
-    @Autowired
-    TransactionConverter trmps;
+    public UserService(UserRepository ur, BalanceRepository br, TransactionRepository tr) {
+        this.ur = ur;
+        this.br = br;
+        this.tr = tr;
+    }
 
     private UserBalanceDTO mapToUserBalanceDTO(User user) {
         UserBalanceDTO dto = new UserBalanceDTO();
@@ -55,7 +52,7 @@ public class UserService {
     public User createUserEntity(UserRegistrationDTO current) throws Exception{
 
         if (ur.findOneByUsername(current.getUsername()) != null ) {
-            throw new Exception("Username already used");
+            throw new CustomServiceException(new CustomHttpResponse(HttpStatus.BAD_REQUEST, "Username already used"));
         }
 
         User newuser = new User();
@@ -75,12 +72,11 @@ public class UserService {
     }
 
     public UserBalanceDTO disableOrEnable(Integer id, Boolean toSet) throws Exception {
-        User current = ur.findById(id).orElseThrow(() -> new Exception("User not found"));
+        User current = ur.findById(id).orElseThrow(() -> new CustomServiceException(new CustomHttpResponse(HttpStatus.BAD_REQUEST, "User not found")));
         current.setEnabled(toSet);
         ur.save(current);
         return mapToUserBalanceDTO(current);
     }
-
     public UserBalanceTransDTO findUserById(Integer id) throws Exception {
         User usr = ur.findById(id).orElseThrow(() -> new Exception("User not found"));
         UserBalanceTransDTO toRet = new UserBalanceTransDTO();
@@ -92,7 +88,7 @@ public class UserService {
         toRet.setBonusAmount(bal.getBonus());
         toRet.setCashableAmount(bal.getCashable());
         List<Transaction> allTrs = tr.findAllByUserId(id);
-        List<TransactionDTO> allTrsDto = allTrs.stream().map(trmps::convertToDTO).collect(Collectors.toList());
+        List<TransactionDTO> allTrsDto = allTrs.stream().map(new TransactionConverter()::convertToDTO).collect(Collectors.toList());
         toRet.setTransactions(allTrsDto);
 
         return toRet;
