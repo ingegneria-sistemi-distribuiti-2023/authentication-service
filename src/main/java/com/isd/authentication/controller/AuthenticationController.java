@@ -12,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.concurrent.TimeUnit;
-
 @RestController
 @RequestMapping("/auth/jwt/")
 @RequiredArgsConstructor
@@ -27,8 +25,7 @@ public class AuthenticationController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<AuthenticationResponse> authenticate(@RequestHeader("Secret-Key") String secret, @RequestBody LoginRequest request) throws Exception {TimeUnit.SECONDS.sleep(1);
-//    TimeUnit.SECONDS.sleep(10);
+  public ResponseEntity<AuthenticationResponse> authenticate(@RequestHeader("Secret-Key") String secret, @RequestBody LoginRequest request) throws Exception {
     return new ResponseEntity<>(service.authenticate(request), HttpStatus.OK);
   }
 

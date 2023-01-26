@@ -16,7 +16,7 @@ public class TransactionConverter {
         dto.setCircuit(transaction.getCircuit());
         dto.setDate(transaction.getDate());
         dto.setUserId(transaction.getUserId());
-        dto.setStatus(transaction.getStatus());
+        dto.setType(transaction.getCategory());
 
         return dto;
     }
