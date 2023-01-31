@@ -43,6 +43,9 @@ public class UsersAppTest {
     @InjectMocks
     private UserService userService;
 
+    /*
+     * getAll() must return all user list
+     */
     @Test
     public void getAll_shouldReturnAllUsers() throws Exception {
         User user1 = new User();
@@ -87,6 +90,9 @@ public class UsersAppTest {
         assertEquals(100, result.get(1).getBonusAmount());
     }
 
+    /*
+     * createUserEntity() should save correctly all information
+     */
     @Test
     public void createUserEntity_shouldCreateUser() throws Exception {
         UserRegistrationDTO userDto = new UserRegistrationDTO();
@@ -117,6 +123,9 @@ public class UsersAppTest {
         assertTrue(result.getEnabled());
     }
 
+    /*
+     * createUserEntity() must throw a specific error if Username is already used
+     */
     @Test
     public void createUserEntity_shouldThrowException_whenUsernameAlreadyUsed() throws Exception {
         UserRegistrationDTO userDto = new UserRegistrationDTO();
@@ -130,6 +139,9 @@ public class UsersAppTest {
         assertThrows(Exception.class, () -> userService.createUserEntity(userDto), "Username already used");
     }
 
+    /*
+     * disableOrEnable() must work
+     */
     @Test
     public void disableOrEnable_shouldDisableUser() throws Exception {
         User user = new User();
@@ -156,6 +168,9 @@ public class UsersAppTest {
         assertEquals(50f, result.getBonusAmount());
     }
 
+    /*
+     * disableOrEnable() must throw a specific error if user is not found
+     */
     @Test
     public void disableOrEnable_shouldThrowException_whenUserNotFound() throws Exception {
         when(userRepository.findById(1)).thenReturn(Optional.empty());
@@ -163,6 +178,9 @@ public class UsersAppTest {
         assertThrows(Exception.class, () -> userService.disableOrEnable(1, false), "User not found");
     }
 
+    /*
+     * verify that userService.findUserById() returns all available transaction for User
+     */
     @Test
     public void findUserById_shouldReturnUserWithTransactions() throws Exception {
         User user = new User();
